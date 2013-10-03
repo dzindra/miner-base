@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# modify variables here
+
+TARGET_DIR="/home/miner"
+BASE_DIR="$TARGET_DIR/miner-base"
+BFGMINER_REPO="http://github.com/luke-jr/bfgminer.git"
+BFGSTAT_REPO="http://github.com/dzindra/bfg-stats.git"
+
+
+# install or update git repos
+function checkGit {
+	printf "Checking git repository $2/$3...\n";
+	if [ -d "$2/$3" ]; then
+		pushd "$2/$3" > /dev/null
+		git pull
+		popd > /dev/null
+	else
+		pushd "$2" > /dev/null
+		git clone "$1" "$3"
+		popd > /dev/null
+		printf "Repository $3 cloned.\n";
+	fi
+}
+checkGit "$BFGMINER_REPO" "$TARGET_DIR" "bfgminer"
+checkGit "$BFGSTAT_REPO" "$TARGET_DIR" "bfg-stats"
+
+
+
+# cron entry
+if cat /etc/crontab | grep "$BASE_DIR/run" >> /dev/null; then
+	printf "Cron entry already created\n"
+else
+	printf "\n# attempt to start bfgminer if needed\n* *     * * *    miner   [ -x \"$BASE_DIR/run\" ] && \"$BASE_DIR/run\" -q\n\n" >> /etc/crontab
+fi
+
+
+# apache site
+if [ -e /etc/apache2/sites-available/bfg-stat ]; then
+	printf "Apache2 site already created\n"
+else
+	ln -s "$BASE_DIR/apache-site" /etc/apache2/sites-available/bfg-stat
+	# enable site and reload apache
+	a2ensite bfg-stat && service apache2 reload
+fi
+

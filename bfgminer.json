@@ -1,0 +1,27 @@
+{
+"pools": [
+		{
+			"url": "eu-stratum.btcguild.com:3333",
+			"user": "dzindra_2",
+			"pass": "1234"
+		},
+		{
+			"url": "stratum.btcguild.com:3333",
+			"user": "dzindra_2",
+			"pass": "1234"
+		},
+		{
+			"url": "stratum.bitcoin.cz:3333",
+			"user": "dzindra.m2",
+			"pass": "1234"
+		}
+
+		
+	],
+"http-port": "8332",
+"scan-serial": "all",
+"api-listen": true,
+"api-port": "4028",
+"api-allow": "W:127.0.0.1,192.168.85.0/24",
+"icarus-timing": "short"
+}

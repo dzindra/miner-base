@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# adjust following if needed
+SCREEN_NAME="bfgminer"
+BFG_FILE="/home/miner/bfgminer/bfgminer"
+CONFIG_FILE="/home/miner/miner-base/bfgminer.json"
+
+
+# parse commandline
+QUIET=0
+OPTIND=1
+while getopts ":qhc:" opt; do
+	case "$opt" in
+		q)  QUIET=1
+		    ;;
+		c)  CONFIG_FILE="$OPTARG"
+		    ;;
+		h)  printf "Options:\n\t-q = quiet mode\n\t-c file = use this config file\n";
+		    exit 0;
+		    ;;
+		\?) printf "Error: Invalid option -$OPTARG\n"
+		    exit 3
+		    ;;
+	esac
+done
+
+# test configfile
+if [ ! -e "$CONFIG_FILE" ]; then
+	[ $QUIET -eq 0 ] && printf "Error: config file \"$CONFIG_FILE\" does not exist!\n":
+	exit 4
+fi
+
+# get bfgminer screen
+TARGET_NAME=`screen -ls | awk '{ print $1; }' | grep -P "^[0-9]+\.$SCREEN_NAME$"`
+
+# if no screen launch one
+if [ -z "$TARGET_NAME" ]; then
+	[ $QUIET -eq 0 ] && printf "Running screen...";
+	screen -dmS "$SCREEN_NAME"
+	if [ $? -ne 0 ]; then
+		[ $QUIET -eq 0 ] && printf "Error: Failed to run screen!\n"
+		exit 2
+	fi
+	[ $QUIET -eq 0 ] && printf "OK\n";
+	TARGET_NAME=`screen -ls | awk '{ print $1; }' | grep -P "^[0-9]+\.$SCREEN_NAME$"`
+
+# more screens - use first
+elif [ `wc -l <<< "$TARGET_NAME"` -gt 1 ]; then
+	TARGET_NAME=`head -n 1 <<< "$TARGET_NAME"`
+	[ $QUIET -eq 0 ] && printf "Warning: More than one instance of screen running! Using \"$TARGET_NAME\" as target screen.\n"
+fi
+
+
+# check if running
+if pidof "$BFG_FILE" > /dev/null; then
+	[ $QUIET -eq 0 ] && printf "Warning: already running!\n"
+	exit 1
+fi
+
+
+# run and wait for a while
+[ $QUIET -eq 0 ] && printf "Starting process...";
+screen -S "$TARGET_NAME" -p 0 -X stuff "$BFG_FILE -c $CONFIG_FILE\n"
+sleep 1
+
+#check if running again
+if pidof "$BFG_FILE" > /dev/null; then
+	[ $QUIET -eq 0 ] && printf "OK\n";
+else
+	[ $QUIET -eq 0 ] && printf "Warning: launched process not running!\n"
+	exit 2
+fi
