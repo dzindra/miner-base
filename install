@@ -4,9 +4,9 @@
 
 TARGET_DIR="/home/miner"
 BASE_DIR="$TARGET_DIR/miner-base"
-BFGMINER_REPO="http://github.com/luke-jr/bfgminer.git"
+BASE_REPO="http://github.com/dzindra/miner-base.git"
 BFGSTAT_REPO="http://github.com/dzindra/bfg-stats.git"
-
+USER_GROUP="miner:miner"
 
 # install or update git repos
 function checkGit {
@@ -22,7 +22,7 @@ function checkGit {
 		printf "Repository $3 cloned.\n";
 	fi
 }
-checkGit "$BFGMINER_REPO" "$TARGET_DIR" "bfgminer"
+checkGit "$BASE_REPO" "$TARGET_DIR" "miner-base"
 checkGit "$BFGSTAT_REPO" "$TARGET_DIR" "bfg-stats"
 
 
@@ -44,3 +44,11 @@ else
 	a2ensite bfg-stat && service apache2 reload
 fi
 
+# copy base config file
+if [ -e "$TARGET_DIR/bfgminer.json" ]; then
+	printf "Config file already copied\n";
+else
+	cp "$BASE_DIR/bfgminer.json" "$TARGET_DIR/bfgminer.json"
+	chown "$USER_GROUP" "$TARGET_DIR/bfgminer.json"
+	printf "Config file copied\n";
+fi
