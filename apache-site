@@ -6,7 +6,7 @@
 		Options FollowSymLinks
 		AllowOverride None
 	</Directory>
-	<Directory /var/www/>
+	<Directory /home/miner/bfg-stats/>
 		Options FollowSymLinks MultiViews
 		AllowOverride All
 		Order allow,deny
@@ -17,7 +17,5 @@
 
 	# Possible values include: debug, info, notice, warn, error, crit,
 	# alert, emerg.
-	LogLevel warn
-
-	CustomLog ${APACHE_LOG_DIR}/access.log combined
+	LogLevel error
 </VirtualHost>
