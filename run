@@ -3,7 +3,7 @@
 # adjust following if needed
 SCREEN_NAME="bfgminer"
 BFG_FILE="/home/miner/miner-base/bfgminer"
-CONFIG_FILE="/home/miner/bfgminer.json"
+CONFIG_FILE="/home/miner/.bfgminer/bfgminer.conf"
 
 
 # parse commandline
