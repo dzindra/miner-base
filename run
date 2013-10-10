@@ -60,7 +60,7 @@ fi
 
 # run and wait for a while
 [ $QUIET -eq 0 ] && printf "Starting process...";
-screen -S "$TARGET_NAME" -p 0 -X stuff "$BFG_FILE -c $CONFIG_FILE\n"
+screen -S "$TARGET_NAME" -p 0 -X stuff "$BFG_FILE -c $CONFIG_FILE --scan-serial all --http-port 8332\n"
 sleep 1
 
 #check if running again
