@@ -65,3 +65,12 @@ else
 	chown -R "$USER_GROUP" "$CONFIG_DIR"
 	printf "Config file copied\n";
 fi
+
+printf "Blinking LED\n"
+gpio mode 0 out
+gpio write 0 1;sleep 0.2
+gpio write 0 0;sleep 0.2
+gpio write 0 1;sleep 0.2
+gpio write 0 0;sleep 0.2
+gpio write 0 1;sleep 0.2
+gpio write 0 0
