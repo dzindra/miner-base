@@ -4,19 +4,27 @@
 SCREEN_NAME="bfgminer"
 BFG_FILE="/home/miner/miner-base/bfgminer"
 CONFIG_FILE="/home/miner/.bfgminer/bfgminer.conf"
-
+ALERT_FILE="/home/miner/miner-base/alert"
+GPIO="/usr/local/bin/gpio"
+GPIO_PIN=0
 
 # parse commandline
 QUIET=0
 OPTIND=1
-while getopts ":qhc:" opt; do
+while getopts ":qhc:a:p:g:" opt; do
 	case "$opt" in
 		q)  QUIET=1
 		    ;;
 		c)  CONFIG_FILE="$OPTARG"
 		    ;;
-		h)  printf "Options:\n\t-q = quiet mode\n\t-c file = use this config file\n";
+		h)  printf "Options:\n\t-q = quiet mode\n\t-c file = use this config file\n\t-a file = use this alert script\n\t-g file = path to gpio\n\t-p pin = gpio pin\n\n";
 		    exit 0;
+		    ;;
+		a)  ALERT_FILE="$OPTARG"
+		    ;;
+		p)  GPIO_PIN="$OPTARG"
+		    ;;
+		g)  GPIO="$OPTARG"
 		    ;;
 		\?) printf "Error: Invalid option -$OPTARG\n"
 		    exit 3
@@ -53,6 +61,18 @@ fi
 
 # check if running
 if pidof "$BFG_FILE" > /dev/null; then
+	if [ '(' -x $GPIO ')' -a '(' -x "$ALERT_FILE" ')' ]; then
+		[ $QUIET -eq 0 ] && printf "Testing for alert..."
+		$GPIO mode $GPIO_PIN out
+		"$ALERT_FILE"
+		if [ $? -eq 0 ]; then
+			[ $QUIET -eq 0 ] && printf "OK\n"
+			$GPIO write $GPIO_PIN 0
+		else
+			[ $QUIET -eq 0 ] && printf "alert!\n"
+			$GPIO write $GPIO_PIN 1
+		fi
+	fi
 	[ $QUIET -eq 0 ] && printf "Warning: already running!\n"
 	exit 1
 fi
