@@ -7,6 +7,7 @@ BASE_DIR="$TARGET_DIR/miner-base"
 CONFIG_FILE="$TARGET_DIR/.bfgminer/bfgminer.conf"
 BASE_REPO="http://github.com/dzindra/miner-base.git"
 BFGSTAT_REPO="http://github.com/dzindra/bfg-stats.git"
+WIRINGPI_REPO="git://git.drogon.net/wiringPi"
 USER_GROUP="miner:miner"
 
 # install or update git repos
@@ -25,7 +26,7 @@ function checkGit {
 }
 checkGit "$BASE_REPO" "$TARGET_DIR" "miner-base"
 checkGit "$BFGSTAT_REPO" "$TARGET_DIR" "bfg-stats"
-
+checkGit "$WIRINGPI_REPO" "$TARGET_DIR" "wiringPi"
 
 
 # cron entry
@@ -43,6 +44,15 @@ else
 	ln -s "$BASE_DIR/apache-site" /etc/apache2/sites-available/bfg-stat
 	# enable site and reload apache
 	a2ensite bfg-stat && service apache2 reload
+fi
+
+# build and install wiringpi
+if [ -e "$TARGET_DIR/wiringPi/gpio/gpio" ]; then
+	printf "Wiringpi already compiled\n"
+else
+	pushd "$TARGET_DIR/wiringPi" > /dev/null
+	./build
+	popd > /dev/null
 fi
 
 # copy base config file
