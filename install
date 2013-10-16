@@ -34,6 +34,7 @@ if cat /etc/crontab | grep "$BASE_DIR/run" >> /dev/null; then
 	printf "Cron entry already created\n"
 else
 	printf "\n# attempt to start bfgminer if needed\n* *     * * *    miner   [ -x \"$BASE_DIR/run\" ] && \"$BASE_DIR/run\" -q\n\n" >> /etc/crontab
+	printf "\n# advertise miner via upnp\n* *     * * *    miner   [ -x \"$BASE_DIR/upnp-beacon\" ] && \"$BASE_DIR/upnp-beacon\" -q -i eth0\n\n" >> /etc/crontab
 fi
 
 

@@ -13,6 +13,8 @@
 		allow from all
 	</Directory>
 
+	Alias /upnp.xml /home/miner/miner-base/upnp-descriptor.php
+
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 
 	# Possible values include: debug, info, notice, warn, error, crit,
